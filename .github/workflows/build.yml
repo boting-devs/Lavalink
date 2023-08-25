@@ -2,8 +2,8 @@ name: Build
 
 on:
   push:
-    branches: [ '**' ]
-    paths-ignore: [ '**.md' ]
+    branches: ["**"]
+    paths-ignore: ["**.md"]
   workflow_call:
     secrets:
       DOCKER_USERNAME:
@@ -58,11 +58,11 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew build
 
-      - name: Execute Gradle build
-        run: ./gradlew build -PtargetPlatform=musl
+      # - name: Execute Gradle build
+      #   run: ./gradlew build -PtargetPlatform=musl
 
-      - name: Publish to Maven
-        run: ./gradlew publish -PMAVEN_USERNAME=$MAVEN_USERNAME -PMAVEN_PASSWORD=$MAVEN_PASSWORD
+      # - name: Publish to Maven
+      #   run: ./gradlew publish -PMAVEN_USERNAME=$MAVEN_USERNAME -PMAVEN_PASSWORD=$MAVEN_PASSWORD
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
@@ -70,8 +70,7 @@ jobs:
           name: Lavalink.jar
           path: |
             LavalinkServer/build/libs/Lavalink.jar
-            LavalinkServer/build/libs/Lavalink-musl.jar
-
+          # LavalinkServer/build/libs/Lavalink-musl.jar
       - name: Docker Meta
         id: meta
         uses: docker/metadata-action@v4
@@ -87,22 +86,22 @@ jobs:
             type=semver,pattern={{major}}
             type=sha,prefix=
 
-      - name: Docker Meta Alpine
-        id: meta-alpine
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ghcr.io/${{ github.repository }}
-            ${{ env.DOCKER_IMAGE }}
-          flavor: |
-            suffix=-alpine,onlatest=true
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha,prefix=
+      # - name: Docker Meta Alpine
+      #   id: meta-alpine
+      #   uses: docker/metadata-action@v4
+      #   with:
+      #     images: |
+      #       ghcr.io/${{ github.repository }}
+      #       ${{ env.DOCKER_IMAGE }}
+      #     flavor: |
+      #       suffix=-alpine,onlatest=true
+      #     tags: |
+      #       type=ref,event=branch
+      #       type=ref,event=pr
+      #       type=semver,pattern={{version}}
+      #       type=semver,pattern={{major}}.{{minor}}
+      #       type=semver,pattern={{major}}
+      #       type=sha,prefix=
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -135,12 +134,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Build Alpine and Push
-        uses: docker/build-push-action@v3
-        with:
-          file: LavalinkServer/docker/alpine.Dockerfile
-          context: .
-          platforms: linux/amd64,linux/arm64/v8
-          push: true
-          tags: ${{ steps.meta-alpine.outputs.tags }}
-          labels: ${{ steps.meta-alpine.outputs.labels }}
+      # - name: Build Alpine and Push
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     file: LavalinkServer/docker/alpine.Dockerfile
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64/v8
+      #     push: true
+      #     tags: ${{ steps.meta-alpine.outputs.tags }}
+      #     labels: ${{ steps.meta-alpine.outputs.labels }}
